@@ -7,7 +7,7 @@ import AudioPlayer from '../components/AudioPlayer'
 import Transcript from '../components/Transcript'
 
 const API_URL = 'https://agentcast-backend.onrender.com'
-
+// const API_URL = 'http://localhost:8000'
 function StarField() {
   const stars = Array.from({ length: 120 }, (_, i) => ({
     id: i,
