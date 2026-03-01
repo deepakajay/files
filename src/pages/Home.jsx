@@ -425,7 +425,7 @@ export default function Home() {
           transition={{ delay: 2 }}
           className="fixed bottom-0 left-0 right-0 z-20 pb-4 pointer-events-none"
         >
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <div
               className="px-4 py-2 rounded-full border border-white/5 text-white/15 text-xs flex items-center gap-2"
               style={{ background: 'rgba(5,5,8,0.8)', backdropFilter: 'blur(20px)', fontFamily: 'JetBrains Mono' }}
@@ -433,6 +433,12 @@ export default function Home() {
               <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
               Powered by AI · AgentCast
             </div>
+            <button
+              className="px-4 py-2 rounded-full border border-purple-500/30 text-purple-500 text-xs bg-white/5 hover:bg-purple-500/10 transition pointer-events-auto"
+              onClick={() => window.location.href = '/library'}
+            >
+              Library
+            </button>
           </div>
         </motion.footer>
       </div>
