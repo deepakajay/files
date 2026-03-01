@@ -1,18 +1,42 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
-import Scene3D from '../components/Scene3D'
 import TopicInput from '../components/TopicInput'
 import LoadingSpinner from '../components/LoadingSpinner'
 import AudioPlayer from '../components/AudioPlayer'
 import Transcript from '../components/Transcript'
 
-const API_URL = 'http://localhost:8000'
+const API_URL = 'https://agentcast-backend.onrender.com'
+
+function StarField() {
+  const stars = Array.from({ length: 120 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 2 + 0.5,
+    opacity: Math.random() * 0.6 + 0.1,
+    duration: Math.random() * 3 + 2,
+  }))
+  return (
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
+      {stars.map(star => (
+        <motion.div
+          key={star.id}
+          style={{
+            position: 'absolute', left: `${star.x}%`, top: `${star.y}%`,
+            width: star.size, height: star.size, borderRadius: '50%', background: 'white',
+          }}
+          animate={{ opacity: [star.opacity, star.opacity * 0.2, star.opacity] }}
+          transition={{ duration: star.duration, repeat: Infinity, delay: Math.random() * 3 }}
+        />
+      ))}
+    </div>
+  )
+}
 
 function HeroText() {
   const [displayText, setDisplayText] = useState('')
   const fullText = 'AgentCast'
-
   useEffect(() => {
     let i = 0
     const t = setInterval(() => {
@@ -24,46 +48,33 @@ function HeroText() {
   }, [])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="text-center mb-6"
-    >
-      {/* Badge */}
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+      style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: 'spring' }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-500/30 mb-6"
-        style={{ background: 'rgba(124,58,237,0.1)' }}
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-        <span className="text-purple-300 text-xs font-mono uppercase tracking-widest" style={{ fontFamily: 'JetBrains Mono' }}>
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          padding: '6px 14px', borderRadius: '999px',
+          border: '1px solid rgba(124,58,237,0.4)', background: 'rgba(124,58,237,0.12)', marginBottom: '1.5rem',
+        }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', display: 'inline-block' }} />
+        <span style={{ color: '#c4b5fd', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           AI-Powered Learning
         </span>
       </motion.div>
-
-      {/* Title */}
-      <h1
-        className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 leading-none gradient-text"
-        style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-0.02em' }}
-      >
-        {displayText}
-        <span className="typewriter-cursor text-purple-400 ml-1">|</span>
+      <h1 style={{
+        fontSize: 'clamp(3.5rem, 10vw, 6rem)', fontWeight: 900, fontFamily: 'Syne, sans-serif',
+        letterSpacing: '-0.02em', lineHeight: 1, marginBottom: '1rem',
+        background: 'linear-gradient(135deg, #a78bfa 0%, #f97316 50%, #a78bfa 100%)',
+        backgroundSize: '200% auto', WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+      }}>
+        {displayText}<span style={{ WebkitTextFillColor: '#a78bfa', opacity: 0.8 }}>|</span>
       </h1>
-
-      {/* Subtitle */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="text-white/40 text-base sm:text-lg max-w-md mx-auto leading-relaxed"
-        style={{ fontFamily: 'DM Sans' }}
-      >
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+        style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif' }}>
         Turn any topic into an AI-powered{' '}
-        <span className="text-orange-400">debate podcast</span>
-        {' '}with two voices
+        <span style={{ color: '#fb923c' }}>debate podcast</span> with two Indian voices
       </motion.p>
     </motion.div>
   )
@@ -73,374 +84,280 @@ function StatsBar() {
   const stats = [
     { label: 'Topics covered', value: '10K+' },
     { label: 'Podcasts generated', value: '50K+' },
-    { label: 'Avg generation time', value: '~45s' },
+    { label: 'Avg generation', value: '~45s' },
     { label: 'Voice quality', value: 'HD' },
   ]
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.5 }}
-      className="flex flex-wrap justify-center gap-6 mt-10 mb-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}
+      style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2.5rem', marginTop: '2rem', marginBottom: '2.5rem' }}>
       {stats.map((s, i) => (
-        <motion.div
-          key={s.label}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.6 + i * 0.1 }}
-          className="text-center"
-        >
-          <p className="text-white/70 text-lg font-bold" style={{ fontFamily: 'Syne' }}>{s.value}</p>
-          <p className="text-white/20 text-xs" style={{ fontFamily: 'JetBrains Mono', fontFamily: 'DM Sans' }}>{s.label}</p>
+        <motion.div key={s.label} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.6 + i * 0.1 }} style={{ textAlign: 'center' }}>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'Syne, sans-serif', margin: 0 }}>{s.value}</p>
+          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', fontFamily: 'DM Sans, sans-serif', margin: '2px 0 0' }}>{s.label}</p>
         </motion.div>
       ))}
     </motion.div>
   )
 }
 
+function ErrorCard({ error, onDismiss }) {
+  const getErrorIcon = (msg) => {
+    if (msg.includes('timed out')) return '⏱️'
+    if (msg.includes('server') || msg.includes('Server')) return '🖥️'
+    if (msg.includes('network') || msg.includes('reach')) return '📡'
+    if (msg.includes('starting up') || msg.includes('cold')) return '🔄'
+    if (msg.includes('requests') || msg.includes('many')) return '🚦'
+    return '⚠️'
+  }
+
+  const getErrorTitle = (msg) => {
+    if (msg.includes('timed out')) return 'Request timed out'
+    if (msg.includes('starting up') || msg.includes('cold')) return 'Server waking up'
+    if (msg.includes('network') || msg.includes('reach')) return 'Connection failed'
+    if (msg.includes('requests') || msg.includes('many')) return 'Rate limited'
+    if (msg.includes('500') || msg.includes('Server error') || msg.includes('agent')) return 'AI generation failed'
+    return 'Something went wrong'
+  }
+
+  const getTip = (msg) => {
+    if (msg.includes('timed out')) return 'The AI took too long. Try a shorter or simpler topic.'
+    if (msg.includes('starting up') || msg.includes('cold')) return 'Render free tier servers sleep after inactivity. Wait 30 seconds and try again.'
+    if (msg.includes('network') || msg.includes('reach')) return 'Check that your backend server is running.'
+    if (msg.includes('requests') || msg.includes('many')) return 'Wait a few seconds before generating again.'
+    if (msg.includes('agent') || msg.includes('AI')) return 'The AI agent returned an unexpected response. Try again or rephrase your topic.'
+    return 'Please try again in a moment.'
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.97 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        width: '100%', maxWidth: '640px', borderRadius: '20px',
+        border: '1px solid rgba(239,68,68,0.25)',
+        background: 'rgba(13,5,5,0.9)', backdropFilter: 'blur(40px)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Red top stripe */}
+      <div style={{ height: 3, background: 'linear-gradient(90deg, #dc2626, #f97316)' }} />
+
+      <div style={{ padding: '20px 24px 24px' }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '22px' }}>{getErrorIcon(error)}</span>
+            <p style={{ color: '#fca5a5', fontWeight: 700, fontSize: '15px', margin: 0, fontFamily: 'Syne, sans-serif' }}>
+              {getErrorTitle(error)}
+            </p>
+          </div>
+          <button onClick={onDismiss} style={{
+            background: 'none', border: 'none', color: 'rgba(252,165,165,0.4)',
+            cursor: 'pointer', fontSize: '18px', padding: '0 0 0 8px', lineHeight: 1,
+            transition: 'color 0.2s',
+          }}>×</button>
+        </div>
+
+        {/* Error message */}
+        <p style={{
+          color: 'rgba(252,165,165,0.75)', fontSize: '13px', margin: '0 0 14px',
+          lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif',
+          padding: '10px 14px', borderRadius: '10px',
+          background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.12)',
+        }}>
+          {error}
+        </p>
+
+        {/* Tip */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+          <span style={{ color: '#fbbf24', fontSize: '13px', flexShrink: 0 }}>💡</span>
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', margin: 0, lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif' }}>
+            {getTip(error)}
+          </p>
+        </div>
+
+        {/* Retry button */}
+        <motion.button
+          onClick={onDismiss}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          style={{
+            marginTop: '16px', width: '100%', padding: '10px',
+            borderRadius: '10px', border: '1px solid rgba(239,68,68,0.25)',
+            background: 'rgba(239,68,68,0.1)', color: '#fca5a5',
+            fontSize: '13px', cursor: 'pointer', fontFamily: 'Syne, sans-serif',
+            fontWeight: 600,
+          }}
+        >
+          Dismiss & try again
+        </motion.button>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Home() {
-  const [topic, setTopic] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [currentTopic, setCurrentTopic] = useState('')
-  const [jobId, setJobId] = useState(null)
-  const [polling, setPolling] = useState(false)
-  const [timeoutReached, setTimeoutReached] = useState(false)
   const resultsRef = useRef()
   const loadingRef = useRef()
-  const pollingIntervalRef = useRef()
-  const pollingTimeoutRef = useRef()
+  const errorRef = useRef()
 
   const handleGenerate = async (inputTopic) => {
     setIsLoading(true)
     setError(null)
     setResult(null)
     setCurrentTopic(inputTopic)
-    setJobId(null)
-    setPolling(false)
-    setTimeoutReached(false)
 
-    // Scroll to loading spinner immediately
+    // Scroll to loading section immediately when generation starts
     setTimeout(() => {
-      loadingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
+      loadingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 150)
 
     try {
-      const res = await axios.post(`${API_URL}/generate`, { topic: inputTopic })
-      if (res.data && res.data.job_id) {
-        setJobId(res.data.job_id)
-        setPolling(true)
-      } else {
-        setError({ error: 'No job_id returned from API', details: '' })
-        setIsLoading(false)
-      }
+      const res = await axios.post(
+        `${API_URL}/generate`,
+        { topic: inputTopic },
+        { timeout: 300000 }
+      )
+      setResult(res.data)
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 300)
     } catch (err) {
-      console.error(err)
-      const apiError = err?.response?.data
-      if (apiError && (apiError.error || apiError.details)) {
-        setError({
-          error: apiError.error || 'Error',
-          details: apiError.details || '',
-        })
-      } else {
-        setError({ error: 'Something went wrong. Please try again.', details: err?.response?.data?.detail || '' })
+      let message = 'Something went wrong. Please try again.'
+
+      if (err.code === 'ECONNABORTED') {
+        message = 'Generation timed out after 5 minutes. Try a simpler topic or try again.'
+      } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        message = 'Cannot reach the server. Make sure the backend is running at ' + API_URL
+      } else if (err.response) {
+        const status = err.response.status
+        const detail = err.response.data?.detail || err.response.data?.message
+        if (status === 422) {
+          message = 'Invalid request — ' + (detail || 'please check your input.')
+        } else if (status === 500) {
+          message = detail || 'Server error. The AI agent failed to generate a response. Please try again.'
+        } else if (status === 503) {
+          message = 'Server is starting up (Render cold start). Please wait 30 seconds and try again.'
+        } else if (status === 429) {
+          message = 'Too many requests. Please wait a moment and try again.'
+        } else if (status === 404) {
+          message = 'API endpoint not found. Check your backend URL.'
+        } else {
+          message = detail || `Unexpected error (${status}). Please try again.`
+        }
       }
+
+      setError(message)
+      // Scroll to error
+      setTimeout(() => {
+        errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 150)
+    } finally {
       setIsLoading(false)
     }
   }
 
-  // Polling logic
-  useEffect(() => {
-    if (!polling || !jobId) return
-
-    pollingIntervalRef.current = setInterval(async () => {
-      try {
-        const statusRes = await axios.get(`${API_URL}/status/${jobId}`)
-        if (statusRes.data && statusRes.data.status) {
-          if (statusRes.data.status === 'completed') {
-            clearInterval(pollingIntervalRef.current)
-            clearTimeout(pollingTimeoutRef.current)
-            setPolling(false)
-            setIsLoading(false)
-            // Fetch result
-            try {
-              const resultRes = await axios.get(`${API_URL}/result/${jobId}`)
-              setResult(resultRes.data)
-              setTimeout(() => {
-                resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }, 300)
-            } catch (err) {
-              setError({ error: 'Failed to fetch result', details: err?.response?.data?.detail || '' })
-            }
-          } else if (statusRes.data.status === 'failed') {
-            clearInterval(pollingIntervalRef.current)
-            clearTimeout(pollingTimeoutRef.current)
-            setPolling(false)
-            setIsLoading(false)
-            setError({ error: 'Podcast generation failed', details: statusRes.data.details || '' })
-          }
-        }
-      } catch (err) {
-        setError({ error: 'Polling error', details: err?.response?.data?.detail || '' })
-        setPolling(false)
-        setIsLoading(false)
-        clearInterval(pollingIntervalRef.current)
-        clearTimeout(pollingTimeoutRef.current)
-      }
-    }, 5000)
-
-    // Timeout after 2 minutes
-    pollingTimeoutRef.current = setTimeout(() => {
-      setTimeoutReached(true)
-      setPolling(false)
-      setIsLoading(false)
-      clearInterval(pollingIntervalRef.current)
-    }, 500000)
-
-    return () => {
-      clearInterval(pollingIntervalRef.current)
-      clearTimeout(pollingTimeoutRef.current)
-    }
-  }, [polling, jobId])
-
   return (
-    <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #050508 0%, #0a0818 50%, #050508 100%)' }}>
-      {/* 3D Background */}
-      <Scene3D isGenerating={isLoading} />
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #050508 0%, #0a0818 50%, #050508 100%)', position: 'relative', overflowX: 'hidden' }}>
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 20%, rgba(124,58,237,0.15) 0%, transparent 60%)' }} />
+      <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.12), transparent)', pointerEvents: 'none', zIndex: 0, filter: 'blur(60px)' }} />
+      <div style={{ position: 'fixed', bottom: '-200px', left: '-200px', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08), transparent)', pointerEvents: 'none', zIndex: 0, filter: 'blur(60px)' }} />
+      <StarField />
 
-      {/* Radial spotlight */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 20%, rgba(124,58,237,0.12) 0%, transparent 60%)',
-        }}
-      />
+      <div style={{ position: 'relative', zIndex: 10, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-
-        {/* Hero section */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-16">
+        {/* Hero */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 1.5rem 4rem' }}>
           <HeroText />
           <StatsBar />
-
-          <TopicInput onGenerate={handleGenerate} isLoading={isLoading || polling} />
-
-          {/* Keyboard hint */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
-            className="mt-4 text-white/15 text-xs font-mono"
-            style={{ fontFamily: 'JetBrains Mono' }}
-          >
+          <TopicInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
+            style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.15)', fontSize: '12px', fontFamily: 'JetBrains Mono, monospace' }}>
             Press ↵ Enter to generate
           </motion.p>
         </div>
 
-        {/* Loading state */}
-        <AnimatePresence>
-          {(isLoading || polling) && (
-            <motion.div
-              ref={loadingRef}
-              className="px-4 sm:px-6 pb-16 flex justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div className="w-full max-w-2xl">
-                <LoadingSpinner topic={currentTopic} />
-                <div className="text-center mt-6">
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-lg text-white/70 font-bold"
-                  >
-                    Generating your AI podcast…
-                  </motion.p>
+        {/* Loading — ref attached here for auto-scroll */}
+        <div ref={loadingRef}>
+          <AnimatePresence>
+            {isLoading && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ padding: '0 1.5rem 4rem', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: '100%', maxWidth: '640px' }}>
+                  <LoadingSpinner topic={currentTopic} />
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-        {/* Error state */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.95 }}
-              transition={{ duration: 0.6 }}
-              className="px-4 sm:px-6 pb-8 flex justify-center"
-            >
-              <div className="w-full max-w-2xl rounded-3xl p-7 border-2 border-red-500/30 glass-strong relative overflow-hidden">
-                {/* Animated 3D error orb */}
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-30 blur-2xl pointer-events-none"
-                  style={{ background: 'radial-gradient(circle, #ef4444, #7C3AED, transparent 70%)' }} />
-                <div className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full opacity-20 blur-2xl pointer-events-none"
-                  style={{ background: 'radial-gradient(circle, #f97316, #ef4444, transparent 70%)' }} />
-                <motion.div
-                  initial={{ rotate: -10 }}
-                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute left-1/2 top-0 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-red-500 via-purple-500 to-orange-400 flex items-center justify-center text-3xl shadow-lg"
-                  style={{ zIndex: 2 }}
-                >
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                  </svg>
-                </motion.div>
-                <div className="relative z-10">
-                  <p className="text-red-300 font-bold text-lg mb-2 flex items-center gap-2" style={{ fontFamily: 'Syne' }}>
-                    <span>Generation failed</span>
-                    <motion.span
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 1.2, repeat: Infinity }}
-                      className="inline-block w-3 h-3 rounded-full bg-red-400 animate-pulse"
-                    />
-                  </p>
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-red-400/80 text-base font-mono mb-2"
-                    style={{ fontFamily: 'JetBrains Mono' }}
-                  >
-                    {error.error}
-                  </motion.p>
-                  {error.details && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="bg-red-900/20 border border-red-500/20 rounded-xl p-4 mb-2 text-white/80 text-sm font-mono shadow-lg"
-                      style={{ fontFamily: 'JetBrains Mono', backdropFilter: 'blur(8px)' }}
-                    >
-                      <span className="text-red-300 font-semibold">Details:</span>
-                      <br />
-                      <span>{error.details}</span>
-                    </motion.div>
-                  )}
-                  <motion.button
-                    whileHover={{ scale: 1.08, backgroundColor: '#ef4444' }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => setError(null)}
-                    className="mt-4 px-5 py-2 rounded-full text-xs font-bold text-white bg-red-500/70 hover:bg-red-500 transition-colors shadow-lg"
-                  >
-                    Dismiss
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Error — ref attached here for auto-scroll */}
+        <div ref={errorRef}>
+          <AnimatePresence>
+            {error && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ padding: '0 1.5rem 2rem', display: 'flex', justifyContent: 'center' }}>
+                <ErrorCard error={error} onDismiss={() => setError(null)} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Results */}
         <AnimatePresence>
           {result && (
-            <motion.div
-              ref={resultsRef}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="px-4 sm:px-6 pb-20"
-            >
-              <div className="max-w-2xl mx-auto space-y-6">
-                {/* Result header */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-center gap-3"
-                >
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/20"
-                    style={{ background: 'rgba(124,58,237,0.1)' }}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-green-300 text-xs font-mono" style={{ fontFamily: 'JetBrains Mono' }}>
-                      Ready to play
-                    </span>
+            <motion.div ref={resultsRef} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }} style={{ padding: '0 1.5rem 5rem' }}>
+              <div style={{ maxWidth: '640px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                {/* Ready badge */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, transparent, rgba(124,58,237,0.3), transparent)' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '999px', border: '1px solid rgba(124,58,237,0.25)', background: 'rgba(124,58,237,0.1)' }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                    <span style={{ color: '#86efac', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}>Ready to play</span>
                   </div>
-                  <div className="flex-1 h-px bg-gradient-to-l from-transparent via-purple-500/30 to-transparent" />
-                </motion.div>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, transparent, rgba(124,58,237,0.3), transparent)' }} />
+                </div>
 
                 {/* Topic pill */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-center"
-                >
-                  <span className="inline-block px-4 py-2 rounded-full text-sm font-mono text-white/50 border border-white/8"
-                    style={{ fontFamily: 'DM Sans' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ display: 'inline-block', padding: '8px 16px', borderRadius: '999px', fontSize: '14px', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'DM Sans, sans-serif' }}>
                     🎙️ "{currentTopic}"
                   </span>
-                </motion.div>
+                </div>
 
-                {/* Audio Player */}
                 <AudioPlayer audioUrl={result.audio_url} />
-
-                {/* Transcript */}
                 <Transcript dialogue={result.dialogue} />
 
                 {/* Generate again */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className="flex justify-center pt-4"
-                >
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '1rem' }}>
                   <motion.button
-                    onClick={() => {
-                      setResult(null)
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm text-white/40 border border-white/8 hover:text-white/70 hover:border-purple-500/30 transition-all duration-200"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="1 4 1 10 7 10"/>
-                      <path d="M3.51 15a9 9 0 1 0 .49-3.29"/>
-                    </svg>
-                    Generate another
+                    onClick={() => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '999px', fontSize: '14px', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
+                    ↺ Generate another
                   </motion.button>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="fixed bottom-0 left-0 right-0 z-20 pb-4 pointer-events-none"
-        >
-          <div className="flex justify-center gap-4">
-            <div
-              className="px-4 py-2 rounded-full border border-white/5 text-white/15 text-xs flex items-center gap-2"
-              style={{ background: 'rgba(5,5,8,0.8)', backdropFilter: 'blur(20px)', fontFamily: 'JetBrains Mono' }}
-            >
-              <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
-              Powered by AI · AgentCast
-            </div>
-            <button
-              className="px-4 py-2 rounded-full border border-purple-500/30 text-purple-500 text-xs bg-white/5 hover:bg-purple-500/10 transition pointer-events-auto"
-              onClick={() => window.location.href = '/library'}
-            >
-              Library
-            </button>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', paddingBottom: '1rem', zIndex: 20, pointerEvents: 'none' }}>
+          <div style={{ padding: '6px 16px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(5,5,8,0.85)', backdropFilter: 'blur(20px)', color: 'rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#a78bfa', display: 'inline-block' }} />
+            Powered by AI · AgentCast
           </div>
-        </motion.footer>
+        </div>
       </div>
     </div>
   )
