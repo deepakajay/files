@@ -105,14 +105,22 @@ export default function Home() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [currentTopic, setCurrentTopic] = useState('')
+  const [jobId, setJobId] = useState(null)
+  const [polling, setPolling] = useState(false)
+  const [timeoutReached, setTimeoutReached] = useState(false)
   const resultsRef = useRef()
   const loadingRef = useRef()
+  const pollingIntervalRef = useRef()
+  const pollingTimeoutRef = useRef()
 
   const handleGenerate = async (inputTopic) => {
     setIsLoading(true)
     setError(null)
     setResult(null)
     setCurrentTopic(inputTopic)
+    setJobId(null)
+    setPolling(false)
+    setTimeoutReached(false)
 
     // Scroll to loading spinner immediately
     setTimeout(() => {
@@ -121,14 +129,15 @@ export default function Home() {
 
     try {
       const res = await axios.post(`${API_URL}/generate`, { topic: inputTopic })
-      setResult(res.data)
-      // Scroll to results after short delay
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 300)
+      if (res.data && res.data.job_id) {
+        setJobId(res.data.job_id)
+        setPolling(true)
+      } else {
+        setError({ error: 'No job_id returned from API', details: '' })
+        setIsLoading(false)
+      }
     } catch (err) {
       console.error(err)
-      // Enhanced error handling for API error shape
       const apiError = err?.response?.data
       if (apiError && (apiError.error || apiError.details)) {
         setError({
@@ -138,10 +147,63 @@ export default function Home() {
       } else {
         setError({ error: 'Something went wrong. Please try again.', details: err?.response?.data?.detail || '' })
       }
-    } finally {
       setIsLoading(false)
     }
   }
+
+  // Polling logic
+  useEffect(() => {
+    if (!polling || !jobId) return
+
+    pollingIntervalRef.current = setInterval(async () => {
+      try {
+        const statusRes = await axios.get(`${API_URL}/status/${jobId}`)
+        if (statusRes.data && statusRes.data.status) {
+          if (statusRes.data.status === 'completed') {
+            clearInterval(pollingIntervalRef.current)
+            clearTimeout(pollingTimeoutRef.current)
+            setPolling(false)
+            setIsLoading(false)
+            // Fetch result
+            try {
+              const resultRes = await axios.get(`${API_URL}/result/${jobId}`)
+              setResult(resultRes.data)
+              setTimeout(() => {
+                resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }, 300)
+            } catch (err) {
+              setError({ error: 'Failed to fetch result', details: err?.response?.data?.detail || '' })
+            }
+          } else if (statusRes.data.status === 'failed') {
+            clearInterval(pollingIntervalRef.current)
+            clearTimeout(pollingTimeoutRef.current)
+            setPolling(false)
+            setIsLoading(false)
+            setError({ error: 'Podcast generation failed', details: statusRes.data.details || '' })
+          }
+        }
+      } catch (err) {
+        setError({ error: 'Polling error', details: err?.response?.data?.detail || '' })
+        setPolling(false)
+        setIsLoading(false)
+        clearInterval(pollingIntervalRef.current)
+        clearTimeout(pollingTimeoutRef.current)
+      }
+    }, 5000)
+
+    // Timeout after 2 minutes
+    pollingTimeoutRef.current = setTimeout(() => {
+      setTimeoutReached(true)
+      setPolling(false)
+      setIsLoading(false)
+      clearInterval(pollingIntervalRef.current)
+    }, 500000)
+
+    return () => {
+      clearInterval(pollingIntervalRef.current)
+      clearTimeout(pollingTimeoutRef.current)
+    }
+  }, [polling, jobId])
 
   return (
     <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, #050508 0%, #0a0818 50%, #050508 100%)' }}>
@@ -164,7 +226,7 @@ export default function Home() {
           <HeroText />
           <StatsBar />
 
-          <TopicInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <TopicInput onGenerate={handleGenerate} isLoading={isLoading || polling} />
 
           {/* Keyboard hint */}
           <motion.p
@@ -180,7 +242,7 @@ export default function Home() {
 
         {/* Loading state */}
         <AnimatePresence>
-          {isLoading && (
+          {(isLoading || polling) && (
             <motion.div
               ref={loadingRef}
               className="px-4 sm:px-6 pb-16 flex justify-center"
@@ -190,6 +252,16 @@ export default function Home() {
             >
               <div className="w-full max-w-2xl">
                 <LoadingSpinner topic={currentTopic} />
+                <div className="text-center mt-6">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-lg text-white/70 font-bold"
+                  >
+                    Generating your AI podcast…
+                  </motion.p>
+                </div>
               </div>
             </motion.div>
           )}
