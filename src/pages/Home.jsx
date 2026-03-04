@@ -49,7 +49,7 @@ function HeroText() {
 
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-      style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      style={{ textAlign: 'center', marginBottom: '2rem', width: '100%', overflow: 'hidden' }}>
       <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: 'spring' }}
         style={{
@@ -63,16 +63,17 @@ function HeroText() {
         </span>
       </motion.div>
       <h1 style={{
-        fontSize: 'clamp(3.5rem, 10vw, 6rem)', fontWeight: 900, fontFamily: 'Syne, sans-serif',
+        fontSize: 'clamp(2.6rem, 13vw, 6rem)', fontWeight: 900, fontFamily: 'Syne, sans-serif',
         letterSpacing: '-0.02em', lineHeight: 1, marginBottom: '1rem',
         background: 'linear-gradient(135deg, #a78bfa 0%, #f97316 50%, #a78bfa 100%)',
         backgroundSize: '200% auto', WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+        whiteSpace: 'nowrap', overflow: 'visible',
       }}>
         {displayText}<span style={{ WebkitTextFillColor: '#a78bfa', opacity: 0.8 }}>|</span>
       </h1>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-        style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1.05rem', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif' }}>
+        style={{ color: 'rgba(255,255,255,0.45)', fontSize: 'clamp(0.875rem, 3.5vw, 1.05rem)', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif', padding: '0 1rem' }}>
         Turn any topic into an AI-powered{' '}
         <span style={{ color: '#fb923c' }}>debate podcast</span> with two Indian voices
       </motion.p>
@@ -89,7 +90,7 @@ function StatsBar() {
   ]
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}
-      style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2.5rem', marginTop: '2rem', marginBottom: '2.5rem' }}>
+      style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem', marginTop: '1.5rem', marginBottom: '2rem', padding: '0 1rem' }}>
       {stats.map((s, i) => (
         <motion.div key={s.label} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.6 + i * 0.1 }} style={{ textAlign: 'center' }}>
@@ -265,7 +266,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #050508 0%, #0a0818 50%, #050508 100%)', position: 'relative', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #050508 0%, #0a0818 50%, #050508 100%)', position: 'relative', overflowX: 'hidden', width: '100%' }}>
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 20%, rgba(124,58,237,0.15) 0%, transparent 60%)' }} />
       <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.12), transparent)', pointerEvents: 'none', zIndex: 0, filter: 'blur(60px)' }} />
       <div style={{ position: 'fixed', bottom: '-200px', left: '-200px', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08), transparent)', pointerEvents: 'none', zIndex: 0, filter: 'blur(60px)' }} />
@@ -274,12 +275,14 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 10, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
         {/* Hero */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 1.5rem 4rem' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(3rem, 8vw, 5rem) 1rem clamp(3rem, 6vw, 4rem)', width: '100%' }}>
           <HeroText />
           <StatsBar />
-          <TopicInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <div style={{ width: '100%', maxWidth: '640px', padding: '0 0.5rem' }}>
+            <TopicInput onGenerate={handleGenerate} isLoading={isLoading} />
+          </div>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
-            style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.15)', fontSize: '12px', fontFamily: 'JetBrains Mono, monospace' }}>
+            style={{ marginTop: '0.75rem', color: 'rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}>
             Press ↵ Enter to generate
           </motion.p>
         </div>
