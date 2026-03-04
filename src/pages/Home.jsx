@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
-import TopicInput from '../components/TopicInput'
 import LoadingSpinner from '../components/LoadingSpinner'
 import AudioPlayer from '../components/AudioPlayer'
 import Transcript from '../components/Transcript'
 
 const API_URL = 'https://agentcast-backend.onrender.com'
 // const API_URL = 'http://localhost:8000'
+
 function StarField() {
   const stars = Array.from({ length: 120 }, (_, i) => ({
     id: i,
@@ -48,34 +48,57 @@ function HeroText() {
   }, [])
 
   return (
-    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-      style={{ textAlign: 'center', marginBottom: '2rem', width: '100%', overflow: 'hidden' }}>
-      <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+    <motion.div
+      initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+      style={{ textAlign: 'center', marginBottom: '1.5rem', width: '100%', padding: '0 1rem' }}
+    >
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: 'spring' }}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
           padding: '6px 14px', borderRadius: '999px',
-          border: '1px solid rgba(124,58,237,0.4)', background: 'rgba(124,58,237,0.12)', marginBottom: '1.5rem',
-        }}>
+          border: '1px solid rgba(124,58,237,0.4)',
+          background: 'rgba(124,58,237,0.12)', marginBottom: '1.25rem',
+        }}
+      >
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', display: 'inline-block' }} />
         <span style={{ color: '#c4b5fd', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           AI-Powered Learning
         </span>
       </motion.div>
+
+      {/* Title scales with viewport so full word is always visible */}
       <h1 style={{
-        fontSize: 'clamp(2.6rem, 13vw, 6rem)', fontWeight: 900, fontFamily: 'Syne, sans-serif',
-        letterSpacing: '-0.02em', lineHeight: 1, marginBottom: '1rem',
+        fontSize: 'clamp(1.8rem, 9vw, 6rem)',
+        fontWeight: 900,
+        fontFamily: 'Syne, sans-serif',
+        letterSpacing: '-0.02em',
+        lineHeight: 1,
+        marginBottom: '1rem',
         background: 'linear-gradient(135deg, #a78bfa 0%, #f97316 50%, #a78bfa 100%)',
-        backgroundSize: '200% auto', WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-        whiteSpace: 'nowrap', overflow: 'visible',
+        backgroundSize: '200% auto',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        display: 'block',
       }}>
         {displayText}<span style={{ WebkitTextFillColor: '#a78bfa', opacity: 0.8 }}>|</span>
       </h1>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-        style={{ color: 'rgba(255,255,255,0.45)', fontSize: 'clamp(0.875rem, 3.5vw, 1.05rem)', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif', padding: '0 1rem' }}>
+
+      <motion.p
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+        style={{
+          color: 'rgba(255,255,255,0.45)',
+          fontSize: 'clamp(0.85rem, 3.5vw, 1.05rem)',
+          maxWidth: '400px',
+          margin: '0 auto',
+          lineHeight: 1.6,
+          fontFamily: 'DM Sans, sans-serif',
+        }}
+      >
         Turn any topic into an AI-powered{' '}
-        <span style={{ color: '#fb923c' }}>debate podcast</span> with two Indian voices
+        <span style={{ color: '#fb923c' }}>debate podcast</span> with two voices
       </motion.p>
     </motion.div>
   )
@@ -84,20 +107,151 @@ function HeroText() {
 function StatsBar() {
   const stats = [
     { label: 'Topics covered', value: '10K+' },
-    { label: 'Podcasts generated', value: '50K+' },
+    { label: 'Podcasts generated', value: '100+' },
     { label: 'Avg generation', value: '~45s' },
     { label: 'Voice quality', value: 'HD' },
   ]
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}
-      style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem', marginTop: '1.5rem', marginBottom: '2rem', padding: '0 1rem' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}
+      style={{
+        display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
+        gap: '1.25rem 2rem', marginTop: '1.25rem', marginBottom: '2rem',
+        padding: '0 1rem', width: '100%',
+      }}
+    >
       {stats.map((s, i) => (
         <motion.div key={s.label} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.6 + i * 0.1 }} style={{ textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'Syne, sans-serif', margin: 0 }}>{s.value}</p>
-          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', fontFamily: 'DM Sans, sans-serif', margin: '2px 0 0' }}>{s.label}</p>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Syne, sans-serif', margin: 0 }}>{s.value}</p>
+          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', fontFamily: 'DM Sans, sans-serif', margin: '2px 0 0' }}>{s.label}</p>
         </motion.div>
       ))}
+    </motion.div>
+  )
+}
+
+// Inlined TopicInput for full mobile control
+function TopicInput({ onGenerate, isLoading }) {
+  const [topic, setTopic] = useState('')
+  const suggestions = [
+    'How does Docker work?',
+    'Explain quantum computing',
+    'What are AI Agents?',
+    'How does the internet work?',
+  ]
+
+  const handleSubmit = () => {
+    if (topic.trim() && !isLoading) onGenerate(topic.trim())
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8 }}
+      style={{ width: '100%' }}
+    >
+      {/* Input + button row */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        width: '100%',
+        borderRadius: '999px',
+        background: 'linear-gradient(135deg, rgba(124,58,237,0.5) 0%, rgba(249,115,22,0.4) 100%)',
+        padding: '3px',
+        boxSizing: 'border-box',
+      }}>
+        {/* Input side */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          flex: 1,
+          minWidth: 0,
+          background: 'rgba(5,5,8,0.88)',
+          borderRadius: '999px 0 0 999px',
+          padding: '0 0.875rem',
+          height: '52px',
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,0.55)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginRight: '8px' }}>
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+          <input
+            type="text"
+            value={topic}
+            onChange={e => setTopic(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            placeholder="What do you want to learn?"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: '#e2e8f0',
+              fontSize: 'clamp(0.8rem, 3.2vw, 0.95rem)',
+              fontFamily: 'DM Sans, sans-serif',
+            }}
+          />
+        </div>
+
+        {/* Generate button */}
+        <button
+          onClick={handleSubmit}
+          disabled={isLoading || !topic.trim()}
+          style={{
+            flexShrink: 0,
+            height: '52px',
+            padding: '0 clamp(0.75rem, 3vw, 1.25rem)',
+            borderRadius: '0 999px 999px 0',
+            border: 'none',
+            background: 'linear-gradient(135deg, #7C3AED, #f97316)',
+            color: 'white',
+            fontSize: 'clamp(0.75rem, 2.8vw, 0.9rem)',
+            fontWeight: 700,
+            fontFamily: 'Syne, sans-serif',
+            cursor: isLoading || !topic.trim() ? 'not-allowed' : 'pointer',
+            opacity: isLoading || !topic.trim() ? 0.55 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            whiteSpace: 'nowrap',
+            transition: 'opacity 0.2s',
+          }}
+        >
+          {isLoading ? '···' : 'Generate →'}
+        </button>
+      </div>
+
+      {/* Suggestion chips */}
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }}
+        style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}
+      >
+        <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', fontFamily: 'DM Sans, sans-serif', alignSelf: 'center' }}>try:</span>
+        {suggestions.map(s => (
+          <button
+            key={s}
+            onClick={() => setTopic(s)}
+            style={{
+              padding: '5px 12px',
+              borderRadius: '999px',
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'transparent',
+              color: 'rgba(255,255,255,0.45)',
+              fontSize: '12px',
+              fontFamily: 'DM Sans, sans-serif',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(167,139,250,0.4)'; e.currentTarget.style.color = 'rgba(167,139,250,0.8)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)' }}
+          >
+            {s}
+          </button>
+        ))}
+      </motion.div>
     </motion.div>
   )
 }
@@ -143,11 +297,8 @@ function ErrorCard({ error, onDismiss }) {
         overflow: 'hidden',
       }}
     >
-      {/* Red top stripe */}
       <div style={{ height: 3, background: 'linear-gradient(90deg, #dc2626, #f97316)' }} />
-
       <div style={{ padding: '20px 24px 24px' }}>
-        {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '22px' }}>{getErrorIcon(error)}</span>
@@ -155,44 +306,17 @@ function ErrorCard({ error, onDismiss }) {
               {getErrorTitle(error)}
             </p>
           </div>
-          <button onClick={onDismiss} style={{
-            background: 'none', border: 'none', color: 'rgba(252,165,165,0.4)',
-            cursor: 'pointer', fontSize: '18px', padding: '0 0 0 8px', lineHeight: 1,
-            transition: 'color 0.2s',
-          }}>×</button>
+          <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'rgba(252,165,165,0.4)', cursor: 'pointer', fontSize: '18px', padding: '0 0 0 8px', lineHeight: 1 }}>×</button>
         </div>
-
-        {/* Error message */}
-        <p style={{
-          color: 'rgba(252,165,165,0.75)', fontSize: '13px', margin: '0 0 14px',
-          lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif',
-          padding: '10px 14px', borderRadius: '10px',
-          background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.12)',
-        }}>
+        <p style={{ color: 'rgba(252,165,165,0.75)', fontSize: '13px', margin: '0 0 14px', lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif', padding: '10px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.12)' }}>
           {error}
         </p>
-
-        {/* Tip */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
           <span style={{ color: '#fbbf24', fontSize: '13px', flexShrink: 0 }}>💡</span>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', margin: 0, lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif' }}>
-            {getTip(error)}
-          </p>
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', margin: 0, lineHeight: 1.5, fontFamily: 'DM Sans, sans-serif' }}>{getTip(error)}</p>
         </div>
-
-        {/* Retry button */}
-        <motion.button
-          onClick={onDismiss}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          style={{
-            marginTop: '16px', width: '100%', padding: '10px',
-            borderRadius: '10px', border: '1px solid rgba(239,68,68,0.25)',
-            background: 'rgba(239,68,68,0.1)', color: '#fca5a5',
-            fontSize: '13px', cursor: 'pointer', fontFamily: 'Syne, sans-serif',
-            fontWeight: 600,
-          }}
-        >
+        <motion.button onClick={onDismiss} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+          style={{ marginTop: '16px', width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', fontSize: '13px', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 600 }}>
           Dismiss & try again
         </motion.button>
       </div>
@@ -215,24 +339,18 @@ export default function Home() {
     setResult(null)
     setCurrentTopic(inputTopic)
 
-    // Scroll to loading section immediately when generation starts
     setTimeout(() => {
       loadingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 150)
 
     try {
-      const res = await axios.post(
-        `${API_URL}/generate`,
-        { topic: inputTopic },
-        { timeout: 300000 }
-      )
+      const res = await axios.post(`${API_URL}/generate`, { topic: inputTopic }, { timeout: 300000 })
       setResult(res.data)
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 300)
     } catch (err) {
       let message = 'Something went wrong. Please try again.'
-
       if (err.code === 'ECONNABORTED') {
         message = 'Generation timed out after 5 minutes. Try a simpler topic or try again.'
       } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
@@ -240,26 +358,15 @@ export default function Home() {
       } else if (err.response) {
         const status = err.response.status
         const detail = err.response.data?.detail || err.response.data?.message
-        if (status === 422) {
-          message = 'Invalid request — ' + (detail || 'please check your input.')
-        } else if (status === 500) {
-          message = detail || 'Server error. The AI agent failed to generate a response. Please try again.'
-        } else if (status === 503) {
-          message = 'Server is starting up (Render cold start). Please wait 30 seconds and try again.'
-        } else if (status === 429) {
-          message = 'Too many requests. Please wait a moment and try again.'
-        } else if (status === 404) {
-          message = 'API endpoint not found. Check your backend URL.'
-        } else {
-          message = detail || `Unexpected error (${status}). Please try again.`
-        }
+        if (status === 422) message = 'Invalid request — ' + (detail || 'please check your input.')
+        else if (status === 500) message = detail || 'Server error. The AI agent failed to generate a response. Please try again.'
+        else if (status === 503) message = 'Server is starting up (Render cold start). Please wait 30 seconds and try again.'
+        else if (status === 429) message = 'Too many requests. Please wait a moment and try again.'
+        else if (status === 404) message = 'API endpoint not found. Check your backend URL.'
+        else message = detail || `Unexpected error (${status}). Please try again.`
       }
-
       setError(message)
-      // Scroll to error
-      setTimeout(() => {
-        errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }, 150)
+      setTimeout(() => { errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 150)
     } finally {
       setIsLoading(false)
     }
@@ -275,19 +382,23 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 10, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
         {/* Hero */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(3rem, 8vw, 5rem) 1rem clamp(3rem, 6vw, 4rem)', width: '100%' }}>
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: 'clamp(3rem, 8vw, 5rem) 1.25rem clamp(3rem, 6vw, 4rem)',
+          width: '100%', boxSizing: 'border-box',
+        }}>
           <HeroText />
           <StatsBar />
-          <div style={{ width: '100%', maxWidth: '640px', padding: '0 0.5rem' }}>
+          <div style={{ width: '100%', maxWidth: '580px', boxSizing: 'border-box' }}>
             <TopicInput onGenerate={handleGenerate} isLoading={isLoading} />
           </div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.3 }}
             style={{ marginTop: '0.75rem', color: 'rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}>
             Press ↵ Enter to generate
           </motion.p>
         </div>
 
-        {/* Loading — ref attached here for auto-scroll */}
+        {/* Loading */}
         <div ref={loadingRef}>
           <AnimatePresence>
             {isLoading && (
@@ -301,7 +412,7 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        {/* Error — ref attached here for auto-scroll */}
+        {/* Error */}
         <div ref={errorRef}>
           <AnimatePresence>
             {error && (
@@ -319,8 +430,6 @@ export default function Home() {
             <motion.div ref={resultsRef} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }} style={{ padding: '0 1.5rem 5rem' }}>
               <div style={{ maxWidth: '640px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-
-                {/* Ready badge */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, transparent, rgba(124,58,237,0.3), transparent)' }} />
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '999px', border: '1px solid rgba(124,58,237,0.25)', background: 'rgba(124,58,237,0.1)' }}>
@@ -329,18 +438,13 @@ export default function Home() {
                   </div>
                   <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, transparent, rgba(124,58,237,0.3), transparent)' }} />
                 </div>
-
-                {/* Topic pill */}
                 <div style={{ textAlign: 'center' }}>
                   <span style={{ display: 'inline-block', padding: '8px 16px', borderRadius: '999px', fontSize: '14px', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'DM Sans, sans-serif' }}>
                     🎙️ "{currentTopic}"
                   </span>
                 </div>
-
                 <AudioPlayer audioUrl={result.audio_url} />
                 <Transcript dialogue={result.dialogue} />
-
-                {/* Generate again */}
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '1rem' }}>
                   <motion.button
                     onClick={() => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
